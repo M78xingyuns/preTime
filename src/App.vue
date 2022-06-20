@@ -1,0 +1,29 @@
+<template>
+    <div id="app" name="123">
+        <router-view />
+    </div>
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+            slots: [],
+        };
+    },
+    methods: {},
+    created() {},
+};
+</script>
+<style>
+*{margin: 0;padding: 0;}
+html,body{
+    width: 100%;
+    height: 100%;
+}
+#app {
+    width: 100%;
+    height: 100%;
+    /* background-color: black; */
+}
+</style>

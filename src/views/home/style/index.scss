@@ -1,0 +1,63 @@
+.clock{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    .posItem{
+        position: absolute;
+        transition: all 1s;
+        
+    }
+    .pos{
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        left: 50%;
+        top: 50%;
+        margin-left: -25px;
+        margin-top: -25px;
+    }
+    .hourbox{
+        transform: rotate(-180deg);
+        .posStaic{
+            position: absolute;
+        }
+    }
+    @for $i from 1 through 12{
+        .hour#{$i}{
+            transform-origin: 0% 0%;
+            transform: rotate($i * 30deg) translate(0,80px);
+        }
+    }
+    .day{
+        @for $i from 1 through 31{
+            .hour#{$i}{
+                transform-origin: 0% 0%;
+                transform: rotate($i * 12deg) translate(0,160px);
+            }
+        }
+    }
+    .mothon{
+        @for $i from 1 through 12{
+            .hour#{$i}{
+                transform-origin: 0% 0%;
+                transform: rotate($i * 30deg) translate(0,220px);
+            }
+        }
+    }
+    .mitne{
+        @for $i from 1 through 59{
+            .hour#{$i}{
+                transform-origin: 0% 0%;
+                transform: rotate($i * 6deg) translate(0,300px);
+            }
+        }
+    }
+    .socend{
+        @for $i from 1 through 59{
+            .hour#{$i}{
+                transform-origin: 0% 0%;
+                transform: rotate($i * 6deg) translate(0,380px);
+            }
+        }
+    }
+}
