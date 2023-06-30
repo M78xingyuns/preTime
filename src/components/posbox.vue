@@ -1,7 +1,13 @@
 <template>
     <div class="clock">
         <div class="clock_label_box" ref="clock_lable" :style="{ transform: `rotate(${deg}deg)` }">
-            <div class="clockLabel" v-for="(item, index) in textArry" :style="{ transform: `translate(${width * level}px, -50%) rotate(${(ro / textArry.length) * index}deg)`, 'transform-origin': `${-width * level}px 50%` }" :key="'lable' + item">
+            <div
+                class="clockLabel"
+                v-for="(item, index) in textArry"
+                :class="[{ textColor: index == currentLight() },{opct:index == 0 && startType},{hide:startType}]"
+                :style="{ transform: `translate(${width * level}px, -50%) rotate(${(ro / textArry.length) * index}deg)`, 'transform-origin': `${-width * level}px 50%` }"
+                :key="'lable' + item"
+            >
                 {{ item }}
             </div>
         </div>
@@ -9,7 +15,6 @@
 </template>
 
 <script>
-import { log } from '../plugins/three.min';
 export default {
     props: {
         width: {
@@ -41,11 +46,14 @@ export default {
         return {
             w: 0,
             ro: 0,
-            monthTime: null,
-            dayTime: null,
-            hoursTime: null,
-            minutesTime: null,
-            secondsTime: null,
+            monthTimeLight: -1,
+            dayTimeLight: -1,
+            hoursTimeLight: -1,
+            minutesTimeLight: -1,
+            secondLight: -1,
+            startType:true,
+            rostartTime:null,
+            roteSend:0
         };
     },
     mounted() {
@@ -53,63 +61,84 @@ export default {
     },
     methods: {
         init() {
-            setTimeout(() => {
+            setTimeout(()=>{
                 this.ro = 360;
-                this.currentTime = new Date();
+                this.startType = false;
                 this.roteStart();
-            }, 1000);
+            })
         },
-        roteStart() {
-            let time = this.currentTime;
+        roteStart(){
+            clearInterval(this.rostartTime)
+            this.rostartTime = setInterval(()=>{
+                this.getTime();
+            },1000)
+            let time = new Date();
+            this.roteSend = time.getSeconds();
+        },
+        getTime(){
+            let time = new Date();
             let m = time.getMonth();
             let d = time.getDate() - 1;
             let h = time.getHours();
             let minutes = time.getMinutes();
-            let s = time.getSeconds();
-            setTimeout(() => {
-                if (this.roteType === "Y") {
-                    this.setRotate(m)
-                    this.monthTime = setInterval(() => {
-                        this.setRotate(m)
-                    }, 86400000);
-                }
-                if (this.roteType === "D") {
-                    this.setRotate(d)
-                    this.dayTime = setInterval(() => {
-                        this.setRotate(d)
-                    }, 86400000);
-                }
-                if (this.roteType === "H") {
-                    this.setRotate(h)
-                    this.hoursTime = setInterval(() => {
-                        let hour = new Date().getHours();
-                        this.setRotate(hour)
-                    }, 60000);
-                }
-                if (this.roteType === "M") {
-                    this.setRotate(minutes)
-                    this.minutesTime = setInterval(() => {
-                        let min = new Date().getMinutes();
-                        this.setRotate(min)
-                    }, 1000);
-                }
-                if (this.roteType === "S") {
-                    let sec = s;
-                    this.setRotate(s)
-                    this.secondsTime = setInterval(() => {
-                        sec++;
-                        this.setRotate(sec)
-                    }, 1000);
-                }
-            }, 1000);
+            if (this.roteType === "Y") {
+                this.setRotate(m);
+                this.monthTimeLight = m;
+            }
+            if (this.roteType === "D") {
+                this.setRotate(d);
+                this.dayTimeLight = d;
+            }
+            if (this.roteType === "H") {
+                this.setRotate(h);
+                this.hoursTimeLight = h;
+            }
+            if (this.roteType === "M") {
+                this.setRotate(minutes);
+                this.minutesTimeLight = minutes;
+            }
+            if (this.roteType === "S") {
+                this.roteSend++;
+                this.setRotate(this.roteSend);
+                this.secondLight = this.roteSend%60
+            }
         },
+       
         backTime(num) {
             return (-360 / this.textArry.length) * num;
         },
-        setRotate(num){
-            this.$refs.clock_lable.style.transform = `rotate(${this.backTime(num)}deg)`;
-        }
+        setRotate(num) {
+            if (this.$refs.clock_lable) {
+                this.$refs.clock_lable.style.transform = `rotate(${this.backTime(num)}deg)`;
+            } else {
+                this.$nextTick(() => {
+                    this.$refs.clock_lable.style.transform = `rotate(${this.backTime(num)}deg)`;
+                });
+            }
+        },
+        currentLight() {
+            if (this.roteType === "Y") {
+               return this.monthTimeLight;
+            }
+            if (this.roteType === "D") {
+                return this.dayTimeLight;
+            }
+            if (this.roteType === "H") {
+                return this.hoursTimeLight;
+            }
+            if (this.roteType === "M") {
+                return this.minutesTimeLight;
+            }
+            if (this.roteType === "S") {
+
+                return this.secondLight;
+            }
+            return -1
+        },
     },
+    beforedestroy(){
+        clearInterval(this.rostartTime)
+    }
 };
 </script>
 
@@ -128,6 +157,7 @@ export default {
     position: relative;
     transform: rotate(-60deg);
     transition: all 1s;
+
 }
 .clockLabel {
     position: absolute;
@@ -144,5 +174,14 @@ export default {
     font-size: 14px;
     width: 60px;
     text-align: center;
+}
+.textColor {
+    color: skyblue;
+}
+.hide{
+    opacity: 0;
+}
+.opct{
+    opacity: 1;
 }
 </style>
